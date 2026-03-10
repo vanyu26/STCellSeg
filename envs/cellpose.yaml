@@ -1,0 +1,23 @@
+name: xenium_cellpose
+
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+  - defaults
+
+dependencies:
+  - python=3.11
+  - pip
+  - numpy
+  - scipy
+  - pillow
+  - tifffile
+  - imagecodecs
+  - opencv
+  - pytorch::pytorch
+  - pytorch::torchvision
+  - pytorch::pytorch-cuda=12.6
+  - pip:
+      - cellpose==4.0.8 --no-deps
+      

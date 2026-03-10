@@ -1,0 +1,93 @@
+# Xenium Segmentation Pipeline Configuration
+# ============================================
+
+# Input/Output Paths
+# ------------------
+input:
+  data_dir: "t:/NIRBA/20251127__HCT116 transduced and nontranduced rerun/output-XETG00060__0077755__Region_2__20251127__090418"
+
+  # Raw Xenium data
+  morphology_images:
+    - "ch0000_dapi.ome.tif"
+    - "ch0001_atp1a1_cd45_e-cadherin.ome.tif"
+
+  channel_names: # cellpose4 supports at max 3 channels segmentation, order according to 
+    - "nuclei"
+    - "cellbound"
+
+  mask_path:  # optionally load mask_path if finetuning is required (not implemented yet)
+  mask_type:  # optionally load mask_path if finetuning is required (not implemented yet)
+ 
+
+output:
+  base_dir: "a:/STCellSeg_HCT116Region2"
+
+# Image Processing Parameters
+# ----------------------------
+image:
+  # Microns per pixel for loading of images and unit conversion: 0=native (0.2125 um/px), 1=2x down (0.425 um/px), 2=4x down (0.85 um/px)
+  mpp: 0.85
+  mask_type: # "nucleus" or "cell" use to load mask for finetuning or evaluation, keep it as none for now
+
+# Tiling Parameters
+# ------------------
+tiling:
+  tile_size: 1024
+  overlap: 32 # Overlap in pixels (recommended: 64-128 for flow stitching)
+  pad_mode: "constant"
+  pad_value: 0.0
+
+# Cellpose Parameters
+# -------------------
+cellpose:
+  use_gpu: true
+  # flow_threshold: 0.4
+  # cellprob_threshold: 0.0 # In logits
+  
+
+# Stitching Parameters
+# ---------------------
+stitching:
+  method: "flow_inner" # or mask iou which is not implemented yet
+  use_cellpose_dynamics: true # False is not implemented yet 
+
+  # For flow-based stitching
+  flow:
+    cellprob_threshold: 0.0
+    flow_threshold: 0.4
+    min_size: 15
+
+# Morphology Analysis Parameters
+# -------------------------------
+
+# Transcript Assignment Parameters
+# ---------------------------------
+transcript_assignment:
+  quality_threshold: 20.0
+  use_valid_flag: true # Use Xenium 'valid' flag instead of Q-score
+  origin: [0.0, 0.0] # Origin in microns [x, y]
+  save_transcript_df: true # Save full transcript-to-cell assignments (can be large)
+  save_npz: false # fast saving using numpy npz for debuggging
+  
+
+# Computational Resources
+# ------------------------
+resources:
+  preprocessing:
+    threads: 4
+
+  cellpose_inference:
+    threads: 1
+    gpu: true
+    gpu_id: 0
+
+  stitching:
+    threads: 1
+    gpu: true
+    gpu_id: 0
+
+  morphology:
+    threads: 32
+
+  transcript_assignment:
+    threads: 32
